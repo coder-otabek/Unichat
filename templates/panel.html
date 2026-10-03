@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ site_title }} — Admin Panel</title>
+<link rel="icon" type="image/png" href="/logo/">
+<style>
+:root{
+  --bg-from:#FBF6EC;--bg-to:#EDE0C8;
+  --glass:rgba(255,251,243,0.82);--glass-2:rgba(255,249,238,0.65);
+  --border:rgba(200,180,148,0.40);--border-2:rgba(180,160,128,0.25);
+  --ink:#1C180F;--ink-2:#7A7060;--ink-3:#B8AE9A;
+  --accent:#C07B08;--accent-h:#A86A06;--accent-bg:rgba(192,123,8,0.08);
+  --danger:#B04228;--danger-bg:rgba(176,66,40,0.08);
+  --sage:#3D6B49;--sage-bg:rgba(61,107,73,0.08);
+  --warn:#B8860B;--warn-bg:rgba(184,134,11,0.08);
+  --shadow:0 4px 24px rgba(100,70,20,0.10);
+  --shadow-sm:0 2px 8px rgba(100,70,20,0.06);
+  --blur:blur(20px) saturate(160%);--r:14px;--r-sm:9px;
+}
+[data-theme="dark"]{
+  --bg-from:#060F1A;--bg-to:#0A1525;
+  --glass:rgba(10,22,40,0.82);--glass-2:rgba(8,18,34,0.65);
+  --border:rgba(70,120,200,0.20);--border-2:rgba(50,100,180,0.12);
+  --ink:#C8D8EE;--ink-2:#6E8FAF;--ink-3:#3A5270;
+  --accent:#E09B1A;--accent-h:#CA8810;--accent-bg:rgba(224,155,26,0.10);
+  --danger:#D46050;--danger-bg:rgba(212,96,80,0.10);
+  --sage:#50A065;--sage-bg:rgba(80,160,101,0.10);
+  --warn:#E0B040;--warn-bg:rgba(224,176,64,0.10);
+  --shadow:0 4px 24px rgba(0,0,0,0.40);--shadow-sm:0 2px 8px rgba(0,0,0,0.28);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  min-height:100%;font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;
+  background:linear-gradient(135deg,var(--bg-from),var(--bg-to));
+  background-attachment:fixed;color:var(--ink);-webkit-font-smoothing:antialiased;
+}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+/* Navbar */
+nav{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;gap:12px;padding:11px 24px;
+  background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{font-size:16px;font-weight:700;color:var(--ink);text-decoration:none;
+  display:flex;align-items:center;gap:8px}
+.nav-logo img{width:22px;height:22px;border-radius:6px;object-fit:contain}
+.nav-badge{font-size:11px;background:var(--accent-bg);color:var(--accent);
+  border:1px solid var(--accent);border-radius:99px;padding:2px 9px;font-weight:600}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.nav-user{font-size:13px;color:var(--ink-2)}
+.btn{
+  padding:6px 14px;border-radius:var(--r-sm);border:none;cursor:pointer;
+  font-size:12px;font-weight:600;display:inline-flex;align-items:center;
+  gap:5px;transition:all .15s;font-family:inherit;text-decoration:none;
+}
+.btn-accent{background:var(--accent);color:#fff}.btn-accent:hover{background:var(--accent-h)}
+.btn-glass{background:var(--glass-2);color:var(--ink-2);border:1px solid var(--border)}
+.btn-glass:hover{background:var(--accent-bg);color:var(--accent);border-color:var(--accent)}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-sm{padding:4px 10px;font-size:12px}
+.theme-btn{background:var(--glass-2);border:1px solid var(--border);border-radius:99px;
+  padding:5px 10px;cursor:pointer;color:var(--ink-2);font-size:12px;
+  display:flex;align-items:center;gap:5px;transition:all .15s;font-family:inherit}
+.theme-btn:hover{background:var(--accent-bg);color:var(--accent);border-color:var(--accent)}
+
+/* Container */
+.wrap{max-width:1100px;margin:0 auto;padding:24px 20px}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:24px}
+.stat-card{
+  padding:18px 16px;border-radius:var(--r);
+  background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--border);transition:box-shadow .2s;
+}
+.stat-card:hover{box-shadow:var(--shadow)}
+.stat-icon{font-size:20px;margin-bottom:6px}
+.stat-val{font-size:24px;font-weight:700;margin-bottom:2px}
+.stat-label{font-size:11px;color:var(--ink-2)}
+
+/* Tabs */
+.tabs{display:flex;gap:3px;background:var(--glass-2);border:1px solid var(--border);
+  border-radius:11px;padding:3px;width:fit-content;margin-bottom:20px}
+.tab{padding:7px 18px;border:none;cursor:pointer;border-radius:8px;
+  font-size:13px;font-weight:500;background:transparent;color:var(--ink-2);
+  transition:all .15s;font-family:inherit}
+.tab.active{background:var(--glass);color:var(--ink);font-weight:700;box-shadow:var(--shadow-sm)}
+
+/* Card */
+.card{
+  background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;
+}
+.card-head{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.card-title{font-size:15px;font-weight:700;color:var(--ink)}
+.card-sub{font-size:12px;color:var(--ink-2);margin-top:2px}
+
+/* Upload zone */
+.drop-zone{border:2px dashed var(--border);border-radius:var(--r-sm);
+  padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;
+  background:var(--glass-2)}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:var(--accent-bg)}
+.drop-icon{font-size:32px;margin-bottom:8px}
+.drop-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.drop-sub{font-size:12px;color:var(--ink-2)}
+
+/* Book row */
+.book-row{display:flex;align-items:center;gap:12px;padding:12px 14px;
+  background:var(--glass-2);border:1px solid var(--border-2);border-radius:var(--r-sm);
+  margin-bottom:7px;transition:border-color .15s}
+.book-row:hover{border-color:var(--border)}
+.book-icon{font-size:22px;flex-shrink:0}
+.book-info{flex:1;min-width:0}
+.book-title{font-size:13px;font-weight:600;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.book-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;
+  background:var(--glass);border:1px solid var(--border-2);color:var(--ink-2)}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;
+  border-radius:99px;font-size:11px;font-weight:600}
+.badge-ok{background:var(--sage-bg);color:var(--sage)}
+.badge-err{background:var(--danger-bg);color:var(--danger)}
+.badge-proc{background:var(--warn-bg);color:var(--warn)}
+.book-actions{display:flex;gap:5px;flex-shrink:0}
+
+/* User row */
+.user-row{display:flex;align-items:center;gap:12px;padding:11px 14px;
+  background:var(--glass-2);border:1px solid var(--border-2);border-radius:var(--r-sm);
+  margin-bottom:7px;flex-wrap:wrap;gap:8px}
+.u-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:14px;flex-shrink:0}
+.u-name{font-size:13px;font-weight:600;color:var(--ink)}
+.u-email{font-size:11px;color:var(--ink-2)}
+
+/* Toggle switch */
+.toggle{position:relative;width:42px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.tslider{position:absolute;inset:0;background:var(--border);border-radius:99px;
+  cursor:pointer;transition:.3s}
+.tslider:before{content:'';position:absolute;width:18px;height:18px;
+  left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.toggle input:checked+.tslider{background:var(--sage)}
+.toggle input:checked+.tslider:before{transform:translateX(18px)}
+
+/* Setting card */
+.set-card{background:var(--glass);backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px 20px;margin-bottom:14px}
+.set-head{display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.set-title{font-size:15px;font-weight:700;color:var(--ink)}
+.set-sub{font-size:12px;color:var(--ink-2);margin-top:2px}
+.set-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;
+  border-radius:99px;font-size:12px;font-weight:600}
+.on{background:var(--sage-bg);color:var(--sage)}
+.off{background:var(--danger-bg);color:var(--danger)}
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--ink-2);
+  margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.field select,.field input[type=number],.field input[type=text],.field input[type=password]{
+  width:100%;padding:7px 10px;background:var(--glass-2);
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  font-size:13px;color:var(--ink);font-family:inherit;outline:none;transition:border-color .15s}
+.field select:focus,.field input:focus{border-color:var(--accent)}
+.span-2{grid-column:1/-1}
+
+/* Progress log */
+.prog-log{margin-top:10px;padding:10px 12px;background:var(--glass-2);
+  border:1px solid var(--border-2);border-radius:var(--r-sm);
+  font-size:11px;font-family:monospace;max-height:120px;overflow-y:auto}
+.prog-log p{margin:1px 0;color:var(--ink)}
+
+/* Empty */
+.empty{text-align:center;padding:36px 0;color:var(--ink-2)}
+.empty-icon{font-size:32px;opacity:.4;margin-bottom:8px}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+body{animation:slideUp .3s ease}
+
+@media(max-width:640px){
+  .wrap{padding:14px 12px}
+  nav{padding:10px 14px}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .fields-grid{grid-template-columns:1fr}
+  .span-2{grid-column:1}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">
+    <img src="/logo/" onerror="this.style.display='none'" alt="">
+    {{ site_title }}
+  </a>
+  <span class="nav-badge">Admin Panel</span>
+  <div class="nav-right">
+    <span class="nav-user" id="nav-user"></span>
+    <button class="theme-btn" onclick="toggleTheme()">
+      <span id="t-ico">🌙</span>
+      <span id="t-lbl">Tun</span>
+    </button>
+    <a href="/" class="btn btn-glass btn-sm">← Chat</a>
+    <a href="/admin/" class="btn btn-glass btn-sm">Django Admin</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <!-- Stats -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-val" style="font-size:16px">—</div><div class="stat-label">Yuklanmoqda</div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" id="tab-books" onclick="showTab('books',this)">📚 Kitoblar</button>
+    <button class="tab" id="tab-users" onclick="showTab('users',this)">👥 Foydalanuvchilar</button>
+    <button class="tab" id="tab-settings" onclick="showTab('settings',this)">⚙️ Sozlamalar</button>
+  </div>
+
+  <!-- Books tab -->
+  <div id="pane-books">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Yangi kitob yuklash</div><div class="card-sub">PDF, DOCX, TXT, MD, EPUB · max 50MB</div></div>
+      </div>
+      <div class="drop-zone" id="dz" onclick="document.getElementById('fi').click()"
+        ondragover="dzOver(event,true)" ondragleave="dzOver(event,false)" ondrop="dzDrop(event)">
+        <div class="drop-icon" id="dz-ico">📂</div>
+        <div class="drop-title" id="dz-title">Faylni bu yerga tashlang yoki bosing</div>
+        <div class="drop-sub">Bir vaqtda bir nechta fayl yuklash mumkin</div>
+      </div>
+      <input type="file" id="fi" multiple accept=".pdf,.docx,.txt,.md,.epub" style="display:none" onchange="uploadFiles(this.files)">
+      <div id="prog-log" class="prog-log" style="display:none"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Kitoblar</div>
+        <button class="btn btn-glass btn-sm" onclick="loadBooks()">🔄 Yangilash</button>
+      </div>
+      <div id="books-list"><div class="empty"><div class="empty-icon">📚</div><p>Yuklanmoqda...</p></div></div>
+    </div>
+  </div>
+
+  <!-- Users tab -->
+  <div id="pane-users" style="display:none">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Foydalanuvchilar</div>
+        <button class="btn btn-glass btn-sm" onclick="loadUsers()">🔄 Yangilash</button>
+      </div>
+      <div id="users-list"><div class="empty"><div class="empty-icon">👥</div><p>Yuklanmoqda...</p></div></div>
+    </div>
+  </div>
+
+  <!-- Settings tab -->
+  <div id="pane-settings" style="display:none">
+
+    <!-- Rate limit -->
+    <div class="set-card">
+      <div class="set-head">
+        <div>
+          <div class="set-title">🔢 So'rov limiti</div>
+          <div class="set-sub">Foydalanuvchi va mehmonlar uchun kunlik/oylik limit</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="set-badge off" id="rl-badge">✕ O'chirilgan</span>
+          <label class="toggle"><input type="checkbox" id="rl-toggle" onchange="toggleRL()"><span class="tslider"></span></label>
+        </div>
+      </div>
+      <div class="fields-grid">
+        <div class="field">
+          <label>Foydalanuvchi — kunlik</label>
+          <input type="number" id="rl-user-day" min="1" max="9999" value="20" oninput="saveRL()">
+        </div>
+        <div class="field">
+          <label>Foydalanuvchi — oylik</label>
+          <input type="number" id="rl-user-month" min="1" max="99999" value="100" oninput="saveRL()">
+        </div>
+        <div class="field">
+          <label>Mehmon — kunlik</label>
+          <input type="number" id="rl-guest-day" min="1" max="999" value="5" oninput="saveRL()">
+        </div>
+        <div class="field span-2">
+          <label>Limit tugaganda xabar</label>
+          <input type="text" id="rl-msg" value="Bugungi savol limitingiz tugadi." oninput="saveRL()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Web search -->
+    <div class="set-card">
+      <div class="set-head">
+        <div>
+          <div class="set-title">🌐 Tashqi veb qidiruv</div>
+          <div class="set-sub">Ichki kitob bazasida javob topilmasa internetdan qidiradi</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="set-badge off" id="ws-badge">✕ O'chirilgan</span>
+          <label class="toggle"><input type="checkbox" id="ws-toggle" onchange="toggleWS()"><span class="tslider"></span></label>
+        </div>
+      </div>
+      <div class="fields-grid">
+        <div class="field">
+          <label>Provayder</label>
+          <select id="ws-provider" onchange="saveWS()">
+            <option value="duckduckgo">DuckDuckGo (bepul)</option>
+            <option value="serpapi">SerpAPI</option>
+            <option value="google">Google CSE</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Natijalar soni</label>
+          <select id="ws-count" onchange="saveWS()">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+        <div class="field span-2" id="serpapi-field" style="display:none">
+          <label>SerpAPI Key</label>
+          <input type="password" id="ws-serpapi" placeholder="••••••••" oninput="saveWS()">
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /settings -->
+</div><!-- /wrap -->
+
+<script>
+const token = localStorage.getItem('uc_token');
+if(!token){ location.href='/'; }
+
+const FILE_ICONS = {pdf:'📕',docx:'📘',txt:'📄',md:'📝',epub:'📗'};
+
+/* ── Theme ──────────────────────────────────────── */
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('uc_theme',t);
+  document.getElementById('t-ico').textContent = t==='dark'?'☀':'🌙';
+  document.getElementById('t-lbl').textContent = t==='dark'?'Kunduz':'Tun';
+}
+function toggleTheme(){
+  applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+}
+(function(){
+  const t=localStorage.getItem('uc_theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  applyTheme(t);
+})();
+
+/* ── Auth check ─────────────────────────────────── */
+get('/api/auth/me/').then(r=>r.json()).then(u=>{
+  if(!u.is_admin){ location.href='/'; return; }
+  document.getElementById('nav-user').textContent = u.full_name;
+}).catch(()=>location.href='/');
+
+/* ── Tabs ───────────────────────────────────────── */
+function showTab(name, btn){
+  ['books','users','settings'].forEach(t=>{
+    document.getElementById('pane-'+t).style.display = t===name?'block':'none';
+    document.getElementById('tab-'+t).classList.toggle('active', t===name);
+  });
+  if(name==='users') loadUsers();
+  if(name==='settings') loadSettings();
+}
+
+/* ── API ────────────────────────────────────────── */
+function get(url){ return fetch(url,{headers:{Authorization:'Bearer '+token}}); }
+
+/* ── Stats ──────────────────────────────────────── */
+async function loadStats(){
+  const r = await get('/api/panel/stats/');
+  if(!r.ok) return;
+  const d = await r.json();
+  const items = [
+    {icon:'👥', val:d.users.total,         label:'Jami userlar'},
+    {icon:'✅', val:d.users.active,        label:'Aktiv',              color:'var(--sage)'},
+    {icon:'🚫', val:d.users.total-d.users.active, label:'Nofaol',     color:'var(--danger)'},
+    {icon:'📚', val:d.books.total,         label:'Jami kitoblar'},
+    {icon:'⚡', val:d.books.processed,     label:'Tayyor',             color:'var(--sage)'},
+    {icon:'⏳', val:d.books.processing,    label:'Qayta ishlanmoqda',  color:'var(--warn)'},
+    {icon:'❌', val:d.books.failed,        label:'Xatolik',            color:'var(--danger)'},
+    {icon:'💬', val:d.sessions,            label:'Suhbatlar'},
+    {icon:'✉️', val:d.messages,            label:'Xabarlar'},
+    {icon:'📊', val:(d.requests||{}).today||0,  label:'Bugun (sorov)',  color:'var(--accent)'},
+    {icon:'📈', val:(d.requests||{}).month||0,  label:'Oylik (sorov)'},
+    {icon:'🔢', val:(d.requests||{}).total||0,  label:'Jami (sorov)'},
+  ];
+  document.getElementById('stats-grid').innerHTML = items.map(s=>`
+    <div class="stat-card">
+      <div class="stat-icon">${s.icon}</div>
+      <div class="stat-val" style="color:${s.color||'var(--ink)'}">${(s.val||0).toLocaleString()}</div>
+      <div class="stat-label">${s.label}</div>
+    </div>`).join('');
+}
+
+/* ── Books ──────────────────────────────────────── */
+async function loadBooks(){
+  const r = await get('/api/books/');
+  if(!r.ok) return;
+  const d = await r.json();
+  const books = d.items||[];
+  const el = document.getElementById('books-list');
+  if(!books.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📚</div><p>Hali kitob yuklanmagan</p></div>';
+    return;
+  }
+  el.innerHTML = books.map(b=>{
+    const icon = FILE_ICONS[b.file_type]||'📄';
+    const sz   = b.file_size<1048576?(b.file_size/1024).toFixed(1)+'KB':(b.file_size/1048576).toFixed(1)+'MB';
+    let badge;
+    if(b.is_processed)        badge=`<span class="badge badge-ok">✓ Tayyor</span>`;
+    else if(b.processing_error) badge=`<span class="badge badge-err">✕ Xatolik</span>`;
+    else                       badge=`<span class="badge badge-proc"><span style="animation:spin 1s linear infinite;display:inline-block">⏳</span> Jarayonda</span>`;
+    return `
+      <div class="book-row" id="bk${b.id}">
+        <div class="book-icon">${icon}</div>
+        <div class="book-info">
+          <div class="book-title">${esc(b.title)}</div>
+          <div class="book-meta">
+            <span class="tag">${b.file_type.toUpperCase()}</span>
+            <span class="tag">${sz}</span>
+            ${b.page_count?`<span class="tag">${b.page_count} sahifa</span>`:''}
+            ${b.chunk_count?`<span class="tag">${b.chunk_count} bolak</span>`:''}
+            ${badge}
+          </div>
+          ${b.processing_error?`<div style="font-size:11px;color:var(--danger);margin-top:3px;font-family:monospace">${esc(b.processing_error.slice(0,100))}</div>`:''}
+        </div>
+        <div class="book-actions">
+          <button class="btn btn-glass btn-sm" onclick="reprocess(${b.id})" title="Qayta ishlash">🔄</button>
+          <button class="btn btn-danger btn-sm" onclick="delBook(${b.id},'${esc(b.title)}')" title="Ochirish">🗑</button>
+        </div>
+      </div>`;
+  }).join('');
+  if(books.some(b=>!b.is_processed&&!b.processing_error)){
+    setTimeout(loadBooks, 4000);
+  }
+}
+
+async function delBook(id,title){
+  if(!confirm(title+' ochirilsinmi?')) return;
+  const r=await fetch(`/api/books/${id}/delete/`,{method:'DELETE',headers:{Authorization:'Bearer '+token}});
+  if(r.status===204){ document.getElementById('bk'+id)?.remove(); loadStats(); toast("O'chirildi",'ok'); }
+  else toast('Xatolik','err');
+}
+
+async function reprocess(id){
+  const r=await fetch(`/api/books/${id}/reprocess/`,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'}});
+  if(r.ok){ toast('Qayta ishlanmoqda...','ok'); setTimeout(loadBooks,1500); }
+  else toast('Xatolik','err');
+}
+
+/* ── Upload ─────────────────────────────────────── */
+function dzOver(e,over){e.preventDefault();document.getElementById('dz').classList.toggle('drag',over);}
+function dzDrop(e){e.preventDefault();document.getElementById('dz').classList.remove('drag');uploadFiles(e.dataTransfer.files);}
+
+async function uploadFiles(files){
+  if(!files||!files.length) return;
+  const log = document.getElementById('prog-log');
+  log.style.display='block'; log.innerHTML='';
+  document.getElementById('dz-ico').textContent='⏳';
+  document.getElementById('dz-title').textContent='Yuklanmoqda...';
+  for(const f of Array.from(files)){
+    const p=document.createElement('p');
+    p.textContent=`⏳ "${f.name}" yuklanmoqda...`;
+    log.appendChild(p); log.scrollTop=log.scrollHeight;
+    try{
+      const fd=new FormData(); fd.append('file',f);
+      const r=await fetch('/api/books/upload/',{method:'POST',headers:{Authorization:'Bearer '+token},body:fd});
+      if(r.ok){ p.textContent=`✅ "${f.name}" yuklandi`; }
+      else{ const d=await r.json(); p.textContent=`❌ "${f.name}": ${d.detail||'Xatolik'}`; p.style.color='var(--danger)'; }
+    }catch(e){ p.textContent=`❌ "${f.name}": ${e.message}`; p.style.color='var(--danger)'; }
+  }
+  document.getElementById('dz-ico').textContent='📂';
+  document.getElementById('dz-title').textContent='Faylni bu yerga tashlang yoki bosing';
+  document.getElementById('fi').value='';
+  loadBooks(); loadStats();
+}
+
+/* ── Users ──────────────────────────────────────── */
+async function loadUsers(){
+  const r=await get('/api/panel/users/');
+  if(!r.ok) return;
+  const users=await r.json();
+  const el=document.getElementById('users-list');
+  if(!users.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><p>Foydalanuvchi yoq</p></div>';
+    return;
+  }
+  el.innerHTML=users.map(u=>`
+    <div class="user-row" style="opacity:${u.is_active?1:.65}">
+      <div class="u-avatar" style="background:${u.is_admin?'var(--accent)':'var(--sage)'}">
+        ${u.is_admin?'👑':'👤'}
+      </div>
+      <div>
+        <div class="u-name">${esc(u.full_name)}${u.is_admin?'<span style="color:var(--accent);font-size:10px;margin-left:5px">★ admin</span>':''}</div>
+        <div class="u-email">${esc(u.email)}</div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="badge ${u.is_active?'badge-ok':'badge-err'}">${u.is_active?'✓ Aktiv':'✕ Nofaol'}</span>
+        ${!u.is_admin?`<button class="btn btn-glass btn-sm" onclick="toggleUser(${u.id})">${u.is_active?'Bloklash':'Faollashtirish'}</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+async function toggleUser(id){
+  const r=await fetch(`/api/panel/users/${id}/toggle/`,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'}});
+  if(r.ok){ loadUsers(); loadStats(); }
+  else toast('Xatolik','err');
+}
+
+/* ── Settings ───────────────────────────────────── */
+async function loadSettings(){
+  try{
+    const r=await get('/api/config/');
+    if(!r.ok) return;
+    const d=await r.json();
+    // Rate limit
+    const rlOn = d.enable_rate_limit||false;
+    document.getElementById('rl-toggle').checked = rlOn;
+    setBadge('rl-badge', rlOn);
+    if(d.user_daily_limit)      document.getElementById('rl-user-day').value   = d.user_daily_limit;
+    if(d.user_monthly_limit)    document.getElementById('rl-user-month').value = d.user_monthly_limit;
+    if(d.guest_daily_limit)     document.getElementById('rl-guest-day').value  = d.guest_daily_limit;
+    if(d.limit_exceeded_message)document.getElementById('rl-msg').value        = d.limit_exceeded_message;
+    // Web search
+    const wsOn = d.allow_web_search||false;
+    document.getElementById('ws-toggle').checked = wsOn;
+    setBadge('ws-badge', wsOn);
+    if(d.web_search_provider) document.getElementById('ws-provider').value = d.web_search_provider;
+    toggleSerpField();
+  }catch(e){}
+}
+
+function setBadge(id, on){
+  const el=document.getElementById(id);
+  el.className='set-badge '+(on?'on':'off');
+  el.textContent = on ? '\u2713 Yoqilgan' : '\u2715 O\'chirilgan';
+}
+
+/* Rate limit */
+async function toggleRL(){
+  const r=await fetch('/api/panel/rate-limit/toggle/',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'}});
+  if(!r.ok){ toast('Xatolik','err'); return; }
+  const d=await r.json();
+  setBadge('rl-badge', d.enable_rate_limit);
+  toast(d.enable_rate_limit ? 'Limit yoqildi' : "Limit o'chirildi",'ok');
+}
+
+function saveRL(){
+  clearTimeout(window._rlT);
+  window._rlT=setTimeout(async()=>{
+    await fetch('/api/panel/rate-limit/settings/',{
+      method:'POST',
+      headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({
+        user_daily_limit:   parseInt(document.getElementById('rl-user-day').value)||20,
+        user_monthly_limit: parseInt(document.getElementById('rl-user-month').value)||100,
+        guest_daily_limit:  parseInt(document.getElementById('rl-guest-day').value)||5,
+        limit_exceeded_message: document.getElementById('rl-msg').value,
+      }),
+    });
+  },800);
+}
+
+/* Web search */
+async function toggleWS(){
+  const r=await fetch('/api/panel/web-search/toggle/',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'}});
+  if(!r.ok){ toast('Xatolik','err'); return; }
+  const d=await r.json();
+  setBadge('ws-badge', d.allow_web_search);
+  toast(d.allow_web_search ? 'Veb qidiruv yoqildi' : "Veb qidiruv o'chirildi",'ok');
+}
+
+async function saveWS(){
+  await fetch('/api/panel/web-search/settings/',{
+    method:'POST',
+    headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+    body:JSON.stringify({
+      web_search_provider: document.getElementById('ws-provider').value,
+      web_search_results:  document.getElementById('ws-count').value,
+      serpapi_key:         document.getElementById('ws-serpapi')?.value||'',
+    }),
+  });
+  toggleSerpField();
+}
+
+function toggleSerpField(){
+  const el=document.getElementById('serpapi-field');
+  if(el) el.style.display = document.getElementById('ws-provider').value==='serpapi'?'block':'none';
+}
+
+/* ── Utils ──────────────────────────────────────── */
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function toast(msg,type='ok'){
+  const el=document.createElement('div');
+  el.style.cssText=`position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:10px;
+    font-size:13px;font-weight:600;z-index:999;box-shadow:var(--shadow);animation:slideUp .3s ease;
+    background:${type==='ok'?'var(--sage)':'var(--danger)'};color:#fff`;
+  el.textContent=msg; document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2500);
+}
+
+/* ── Init ───────────────────────────────────────── */
+loadStats();
+loadBooks();
+</script>
+</body>
+</html>

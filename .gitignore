@@ -1,0 +1,59 @@
+# ═══════════════════════════════════════════════
+#  UniChat — faqat kod qoladi
+# ═══════════════════════════════════════════════
+
+# ── Python keshlari ──
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ── Virtual muhit ──
+venv/
+.venv/
+env/
+
+# ── Sozlamalar va maxfiy fayllar ──
+.env
+.env.*
+!.env.example
+*.local
+
+# ── IDE / muharrir sozlamalari ──
+.idea/
+.vscode/
+*.iml
+*.swp
+.DS_Store
+Thumbs.db
+
+# ── Migratsiyalar (faqat __init__.py qoladi) ──
+**/migrations/*
+!**/migrations/__init__.py
+
+# ── Ma'lumotlar bazalari ──
+*.sqlite3
+*.sqlite3-journal
+*.db
+*.sql
+*.dump
+
+# ── Kitoblar va yuklangan fayllar ──
+media/
+*.pdf
+*.docx
+*.doc
+*.epub
+*.txt
+!requirements.txt
+
+# ── Yig'ilgan statik fayllar ──
+staticfiles/
+
+# ── Loglar ──
+*.log
+logs/
