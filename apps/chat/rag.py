@@ -59,13 +59,13 @@ def _cfg():
 def ask(question, chunks, history=None):
     cfg = _cfg()
 
-    # Veb qidiruv sharti:
-    # 1. Ichki bazada hech natija yo'q, YOKI
-    # 2. Topilgan natijalar relevantligi past (max score < 0.40)
+    # Veb qidiruv sharti
     web_results = []
     allow_web = getattr(cfg, 'allow_web_search', False)
-    best_score = max((c['score'] for c in chunks), default=0) if chunks else 0
-    needs_web  = allow_web and (not chunks or best_score < 0.40)
+    
+    # AGAR CHUNKS MAVJUD BO'LSA, DEMAK BAZADA MA'LUMOT BOR!
+    needs_web = allow_web and not chunks
+    
     if needs_web:
         try:
             from apps.core.web_search import search as web_search
@@ -74,13 +74,14 @@ def ask(question, chunks, history=None):
         except Exception as e:
             logger.warning(f"Web search xatosi: {e}")
 
-    # Kontekstga qarab to'g'ri system promptni tanlaymiz
-    if chunks and best_score >= 0.40:
+    # Prompt tanlash
+    if chunks:
         sys_prompt = SYSTEM_BOOK
     elif web_results:
         sys_prompt = SYSTEM_WEB
     else:
         sys_prompt = SYSTEM_NONE
+
     msgs = [{'role':'system','content':sys_prompt}]
     if history:
         for h in list(history)[-cfg.max_history:]:
@@ -106,15 +107,14 @@ def ask(question, chunks, history=None):
     answer, tokens = (_anthropic(msgs, cfg) if provider == 'anthropic'
                       else _openai_compat(msgs, cfg, provider))
 
-    # Manba: nimadan foydalanilgan bo'lsa shuni qaytaramiz
-    if web_results:
-        # Veb natijalar ishlatildi — kitob bo'laklari emas
-        sources = web_results
-    elif chunks and best_score >= 0.40:
-        # Faqat yaxshi kitob natijalari ishlatildi
+    # Manba
+    if chunks:
         sources = chunks
+    elif web_results:
+        sources = web_results
     else:
         sources = []
+        
     return answer, tokens, sources
 
 
