@@ -59,6 +59,35 @@ def _cfg():
 def ask(question, chunks, history=None):
     cfg = _cfg()
 
+    # AI ning vazifasi haqida savollarga doim aniq javob
+    q_lower = question.lower().strip()
+
+    task_questions = [
+        "vazifang nima",
+        "vazifang nima?",
+        "nima vazifa bajarasan",
+        "nima vazifa bajarasiz",
+        "sening vazifang nima",
+        "sen nima qilasan",
+        "nima qila olasan",
+        "sen kimsan",
+        "siz kimsiz",
+        "vazifangiz nima",
+    ]
+
+    if q_lower in task_questions:
+        answer = (
+            "Men O‘zbekiston davlat jahon tillari universitetining "
+            "sun’iy intellekt yordamchisiman. "
+            "Mening vazifam — universitet haqidagi kerakli ma’lumotlarni "
+            "topish va foydalanuvchilarga tushunarli shaklda taqdim etish. "
+            "Men universitetning ma’lumotlar bazasidan foydalanib, "
+            "rahbariyat, fakultetlar, kafedralar, ta’lim yo‘nalishlari, "
+            "bo‘limlar, talabalar uchun xizmatlar va universitetga oid "
+            "boshqa ma’lumotlar haqida yordam bera olaman."
+        )
+        return answer, 0, []
+
     # Veb qidiruv sharti
     web_results = []
     allow_web = getattr(cfg, 'allow_web_search', False)
